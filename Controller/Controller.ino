@@ -13,15 +13,26 @@ int jsButton; //high or low
 int l_w; //left and right wheel speeds
 int r_w;
 
-int air_quality; //analogue 0-1023
-int motion_sensor; //high or low
-int infrared; //analogue
+int dust_reading;
+int humidity_reading;
+int temp_reading;
+bool motion_reading;
+int distance_reading;
+int bearing_reading;
 
 // wire variables
 #define CAR_ADDR 0
 #define SENSOR_ADDR 9
 
-int sensorAnswerSize = 3;
+//request codes
+const int dust = 0;
+const int humidity = 1;
+const int temperature = 2;
+const int motion = 3;
+const int distance = 4;
+const int bearing = 5;
+
+int sensorAnswerSize = 1;
 
 
 void setup() {
@@ -51,46 +62,79 @@ void loop() {
   writeToLeftWheel();
   writeToRightWheel();
 
-  //maybe needs checks to make sure function has been completed
-  //requestAirQuality();
-  //requestMotion();
-  //requestInfrared();
-
-  //delay(200);
+  requestDust();
+  requestHumidity();
+  requestTemp();
+  requestMotion();
+  requestDistance();
+  requestBearing();
 
 }
 
 
-void requestAirQuality() {
+void requestDust() {
   Wire.beginTransmission(SENSOR_ADDR);
-  Wire.write("air");
+  Wire.write(dust);
   Wire.endTransmission();
 
   Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
   while (Wire.available()) {
-    air_quality = Wire.read();
+  dust_reading = Wire.read();
+  }
+}
+
+void requestHumidity() {
+  Wire.beginTransmission(SENSOR_ADDR);
+  Wire.write(humidity);
+  Wire.endTransmission();
+
+  Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
+  while (Wire.available()) {
+  humidity_reading = Wire.read();
+  }
+}
+
+void requestTemp() {
+  Wire.beginTransmission(SENSOR_ADDR);
+  Wire.write(temp);
+  Wire.endTransmission();
+
+  Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
+  while (Wire.available()) {
+  temp_reading = Wire.read();
   }
 }
 
 void requestMotion() {
   Wire.beginTransmission(SENSOR_ADDR);
-  Wire.write("mot");
+  Wire.write(motion);
   Wire.endTransmission();
 
   Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
   while (Wire.available()) {
-    motion_sensor = Wire.read();
+    motion_reading = Wire.read();
   }
 }
 
-void requestInfrared() {
+void requestDistance() {
   Wire.beginTransmission(SENSOR_ADDR);
-  Wire.write("inf");
+  Wire.write(distance);
   Wire.endTransmission();
 
   Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
   while (Wire.available()) {
-    infrared = Wire.read();
+    distance_reading = Wire.read();
+  }
+}
+
+void requestBearing() {
+  Wire.beginTransmission(SENSOR_ADDR);
+  Wire.write(bearing);
+  Wire.endTransmission();
+
+  Wire.requestFrom(SENSOR_ADDR, sensorAnswerSize);
+  while (Wire.available()) {
+  bearing_reading = Wire.read();
   }
 }
 
