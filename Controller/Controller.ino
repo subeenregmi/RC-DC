@@ -21,7 +21,7 @@ int infrared; //analogue
 #define CAR_ADDR 0
 #define SENSOR_ADDR 9
 
-int sensorAnswerSize = 2;
+int sensorAnswerSize = 3;
 
 
 void setup() {
@@ -39,8 +39,8 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   //add joystick readings
-  xR = 1023 - analogRead(jsXPin);
-  yR = analogRead(jsYPin);
+  xR = map(1023 - analogRead(jsXPin), 0, 1023, 0, 255); 
+  yR = map(analogRead(jsYPin), 0, 1023, 0, 255);
 
   Serial.print(xR);
   Serial.print(", ");

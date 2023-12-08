@@ -5,7 +5,9 @@ int l_w;
 int r_w;
 int xR;
 int yR;
-int speed;
+int wspeed;
+
+int deadzone = 20;
 
 //pins
 const int lwSpeedPin = 3;
@@ -17,8 +19,8 @@ const int rwInputPin2 = 13;
 
 //wire variables
 #define CAR_ADDR 0
-int answerSize = 2; //change if speed is <255
-bool side = false; //false is left, true is right
+int answerSize = 3; //change if speed is <255
+bool side = true; //false is left, true is right
 
 
 void setup() {
@@ -42,18 +44,19 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  speed = map(yR, 0, 1023, -255, 255);
-  if (xR > 912) { //to turn right
-    l_w = speed;
+  wspeed = map(yR, 0, 255, -255, 255);
+  //Serial.println(wspeed);
+  if (xR > (128 + deadzone)) { //to turn right
+    l_w = wspeed;
     r_w = 0;
   }
-  else if (xR < 112) {
+  else if (xR < (128 - deadzone)) {
     l_w = 0;
-    r_w = speed;
+    r_w = wspeed;
   }
   else {
-    l_w = speed;
-    r_w = speed;
+    l_w = wspeed;
+    r_w = wspeed;
   }
 
   analogWrite(lwSpeedPin, abs(l_w));
@@ -87,17 +90,20 @@ void loop() {
 
 }
 
-void updateSpeed() {
+void updateSpeed(int x) {
   if (side) { //if True, write to right, then flip to left
     while (0 < Wire.available()) {
-      yR = Wire.read();
+      yR =255 -  Wire.read();
     }
+    Serial.print(yR);
+    Serial.print(", ");
     side = !side;
   }
   else { //--''-- opposite
     while (0 < Wire.available()) {
       xR = Wire.read();
     }
+    Serial.println(xR);
     side = !side;
   }
 }
