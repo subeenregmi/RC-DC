@@ -1,13 +1,13 @@
 #include <Wire.h>
 
 //variables
-int l_w;
+int l_w; //speeds to write to the wheels
 int r_w;
-int xR;
+int xR; //data received from the controller
 int yR;
 int wspeed;
 
-int deadzone = 20;
+int deadzone = 20; //readings within this from the centre will not turn the car
 
 //pins
 const int lwSpeedPin = 3;
@@ -19,7 +19,7 @@ const int rwInputPin2 = 13;
 
 //wire variables
 #define CAR_ADDR 0
-int answerSize = 3; //change if speed is <255
+int answerSize = 1; //change if speed is <255
 bool side = true; //false is left, true is right
 
 
