@@ -12,10 +12,10 @@ int deadzone = 20; //readings within this from the centre will not turn the car
 //pins-Hbridge
 const int lwSpeedPin = 3;
 const int lwInputPin1 = 4;
-const int lwInputPin2 = 7;
-const int rwSpeedPin = 9;
-const int rwInputPin1 = 12;
-const int rwInputPin2 = 13;
+const int lwInputPin2 = 5;
+const int rwSpeedPin = 10;
+const int rwInputPin1 = 9;
+const int rwInputPin2 = 8;
 
 //wire variables
 #define CAR_ADDR 0
@@ -92,7 +92,11 @@ void loop() {
 void updateSpeed(int x) { //when reading is received
   if (side) { //if True, write to yR, then flip to xR
     while (0 < Wire.available()) {
+<<<<<<< HEAD
       yR = 255 -  Wire.read(); //flips the y reading-fixed the car moving backwards
+=======
+      yR = 255 -  Wire.read();
+>>>>>>> f947e73094be6cbb70b521e987987c12271b34d1
     }
     side = !side;//next time write to xR
   }
