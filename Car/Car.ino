@@ -5,11 +5,11 @@ int l_w; //speeds to write to the wheels
 int r_w;
 int xR; //data received from the controller
 int yR;
-int wspeed;
+int baseSpeed; //speed calculated from yR
 
 int deadzone = 20; //readings within this from the centre will not turn the car
 
-//pins
+//pins-Hbridge
 const int lwSpeedPin = 3;
 const int lwInputPin1 = 4;
 const int lwInputPin2 = 7;
@@ -19,8 +19,8 @@ const int rwInputPin2 = 13;
 
 //wire variables
 #define CAR_ADDR 0
-int answerSize = 1; //change if speed is <255
-bool side = true; //false is left, true is right
+int answerSize = 1; 
+bool side = true; //true is yR, false is xR
 
 
 void setup() {
@@ -44,42 +44,41 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  wspeed = map(yR, 0, 255, -255, 255);
-  //Serial.println(wspeed);
+  baseSpeed = map(yR, 0, 255, -255, 255); //map the received reading to a speed and direction
   if (xR > (128 + deadzone)) { //to turn right
-    l_w = wspeed;
+    l_w = baseSpeed;
     r_w = 0;
   }
-  else if (xR < (128 - deadzone)) {
+  else if (xR < (128 - deadzone)) { //turn left
     l_w = 0;
-    r_w = wspeed;
+    r_w = baseSpeed;
   }
-  else {
-    l_w = wspeed;
-    r_w = wspeed;
+  else { 
+    l_w = baseSpeed;
+    r_w = baseSpeed;
   }
 
-  analogWrite(lwSpeedPin, abs(l_w));
+  analogWrite(lwSpeedPin, abs(l_w)); //absolute value of baseSpeed to spin motors
   analogWrite(rwSpeedPin, abs(r_w));
 
-  if (l_w > 20) { //add deadzones here
+  if (l_w > deadzone) { //H-bridge spin forward-left wheel
     digitalWrite(lwInputPin1, HIGH);
     digitalWrite(lwInputPin2, LOW);
   }
-  else if (l_w < -20) {
+  else if (l_w < -deadzone) {//spin back
     digitalWrite(lwInputPin1, LOW);
     digitalWrite(lwInputPin2, HIGH);
   }
-  else {
+  else { 
     digitalWrite(lwInputPin1, LOW);
     digitalWrite(lwInputPin2, LOW);
   }
 
-  if (r_w > 20) { //add deadzones here
+  if (r_w > deadzone) { //same for right wheel
     digitalWrite(rwInputPin1, HIGH);
     digitalWrite(rwInputPin2, LOW);
   }
-  else if (r_w < -20) {
+  else if (r_w < -deadzone) {
     digitalWrite(rwInputPin1, LOW);
     digitalWrite(rwInputPin2, HIGH);
   }
@@ -90,14 +89,12 @@ void loop() {
 
 }
 
-void updateSpeed(int x) {
-  if (side) { //if True, write to right, then flip to left
+void updateSpeed(int x) { //when reading is received
+  if (side) { //if True, write to yR, then flip to xR
     while (0 < Wire.available()) {
-      yR =255 -  Wire.read();
+      yR = 255 -  Wire.read(); //flips the y reading-fixed the car moving backwards
     }
-    Serial.print(yR);
-    Serial.print(", ");
-    side = !side;
+    side = !side;//next time write to xR
   }
   else { //--''-- opposite
     while (0 < Wire.available()) {
@@ -108,6 +105,6 @@ void updateSpeed(int x) {
   }
 }
 
-void requestEvent() {
+void requestEvent() { //never requested from
 
 }
